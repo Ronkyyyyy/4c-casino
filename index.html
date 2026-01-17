@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四字熟語カジノ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="home-screen">
+    <div class="home-content">
+        <h1 class="game-title">四字熟語<br>CASINO</h1>
+        <div class="rules-box">
+            <h3>【ルール】</h3>
+            <ul>
+                <li>全10ラウンド。問題はランダムに出題される。</li>
+                <li><strong>「扉」</strong>の向こうにある漢字の画数を予想せよ。</li>
+                <li>的中すれば画数を獲得。最大画数ならボーナス<strong>+3pt</strong>。</li>
+                <li>最大画数が重複すると<strong>没収(0pt)</strong>。</li>
+            </ul>
+        </div>
+        <button id="start-btn" onclick="startGameFromHome()">GAME START</button>
+    </div>
+</div>
+
+<div class="casino-table">
+    <header>
+        <div class="logo-small">四字熟語 CASINO</div>
+        <div class="score-box">CHIP: <span id="current-score">0</span> pt</div>
+    </header>
+
+    <main>
+        <div id="stage-container">
+            <div id="reel-container"></div>
+            <div id="door-overlay">
+                <div class="door-panel left"></div>
+                <div class="door-panel right"></div>
+                <div class="door-info">
+                    <div id="round-display">ROUND 01/10</div>
+                    <div class="timer-frame">
+                        <div id="timer-bar"></div>
+                    </div>
+                    <div id="door-message">READY...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="card-area"></div>
+
+        <div class="action-area">
+            <button id="bet-btn" onclick="execBet()" disabled>BET!!</button>
+        </div>
+    </main>
+
+    <div id="result-overlay" class="hidden">
+        <div class="result-content">
+            <h2 id="result-title">RESULT</h2>
+            <div id="result-detail"></div>
+            <div id="score-diff" class="score-diff"></div>
+            <button onclick="nextRound()" id="next-btn">NEXT ROUND</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
