@@ -1,4 +1,4 @@
-// --- 問題プール (ここからランダムに10問選出) ---
+// --- 問題プール ---
 const PROBLEM_POOL = [
     {
         id: 1,
@@ -614,21 +614,36 @@ const PROBLEM_POOL = [
             { range: [1, 2], kanji: "象", strokes: 12 },
             { range: [3], kanji: "無", strokes: 12 },
             { range: [4, 5], kanji: "象", strokes: 12 }
-// --- 20260117_最新版 ---
         ]
-    }
+    },
+    {
+        id: 57,
+        text: "馬耳東風",
+        hiragana: ["ば", "じ", "と", "う", "ふ", "う"],
+        solutions: [
+            { range: [0], kanji: "馬", strokes: 10 },
+            { range: [1], kanji: "耳", strokes: 6 },
+            { range: [2, 3], kanji: "東", strokes: 8 },
+            { range: [4, 5], kanji: "風", strokes: 9 }
+        ]
+    },
+// --- 2026.01.17作成 ---
 ];
 
 // --- 設定 ---
-const COUNT_SPEED = 1000; 
+const INIT_CHIPS = 500;
+const MAX_BONUS_RATE = 1.2;
+const COUNT_SPEED = 800; // 緊迫感維持のため遅め
 const ABSORB_DURATION = 600; 
 const TOTAL_ROUNDS = 10;
 
 // --- 状態管理 ---
-let gameQueue = []; // ランダムに選ばれた10問
-let currentScore = 0;
+let gameQueue = [];
+let playedProblems = [];
+let currentChips = INIT_CHIPS;
 let currentRound = 0;
-let hasWonBefore = false;
+let currentBetAmount = 0;
+
 let selectedIndices = [];
 let timerInterval = null;
 let timeLeft = 10.0;
@@ -641,15 +656,22 @@ const doorOverlay = document.getElementById("door-overlay");
 const doorMessage = document.getElementById("door-message");
 const roundDisplay = document.getElementById("round-display");
 const timerBar = document.getElementById("timer-bar");
-const betBtn = document.getElementById("bet-btn");
-const scoreDisplay = document.getElementById("current-score");
+const chipsDisplay = document.getElementById("current-chips");
 const resultOverlay = document.getElementById("result-overlay");
 const homeScreen = document.getElementById("home-screen");
 
+const betControls = document.getElementById("bet-controls");
+const decisionControls = document.getElementById("decision-controls");
+const costDisplay = document.getElementById("cost-display");
+const decideBtn = document.getElementById("decide-btn");
+
+const finalResultOverlay = document.getElementById("final-result-overlay");
+const finalScoreDisplay = document.getElementById("final-score-display");
+const problemListBox = document.getElementById("problem-list-box");
+
+
 // --- ユーティリティ ---
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-// 配列シャッフル
 function shuffleArray(array) {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -659,22 +681,24 @@ function shuffleArray(array) {
     return arr;
 }
 
-// --- ゲームフロー ---
+// --- ゲーム開始 ---
 function startGameFromHome() {
     homeScreen.classList.add("hidden");
     initGame();
 }
 
 function initGame() {
-    currentScore = 0;
+    currentChips = INIT_CHIPS;
     currentRound = 0;
-    hasWonBefore = false;
+    playedProblems = []; 
     
-    // プールからランダムに10問選出
+    // リザルト画面を確実に閉じる
+    finalResultOverlay.classList.remove("open");
+    resultOverlay.classList.add("hidden");
+
+    // 問題プール作成
     const shuffled = shuffleArray(PROBLEM_POOL);
     gameQueue = shuffled.slice(0, TOTAL_ROUNDS);
-    
-    // 問題数が足りない場合の補充（念の為）
     if (gameQueue.length < TOTAL_ROUNDS) {
         while(gameQueue.length < TOTAL_ROUNDS) {
             gameQueue.push(PROBLEM_POOL[Math.floor(Math.random()*PROBLEM_POOL.length)]);
@@ -686,19 +710,33 @@ function initGame() {
 }
 
 function startRound() {
-    if (currentRound >= TOTAL_ROUNDS) {
-        alert("GAME CLEAR! FINAL SCORE: " + currentScore);
-        location.reload();
+    // 終了判定
+    if (currentRound >= TOTAL_ROUNDS || currentChips <= 0) {
+        showFinalResult();
         return;
     }
+
+    // 安全策
+    if (!gameQueue[currentRound]) {
+        showFinalResult();
+        return;
+    }
+
+    // 履歴に追加
+    playedProblems.push(gameQueue[currentRound]);
 
     // リセット
     selectedIndices = [];
     isGameActive = false;
-    betBtn.disabled = true;
+    currentBetAmount = 0;
+    
     timerBar.style.width = "100%";
     timerBar.style.backgroundColor = "#555";
     resultOverlay.classList.add("hidden");
+    
+    // UI切り替え
+    betControls.classList.add("hidden");
+    decisionControls.classList.add("hidden");
     
     // 扉を閉じる
     doorOverlay.classList.remove("open");
@@ -707,11 +745,11 @@ function startRound() {
     
     updateHUD();
     
-    // ステージ構築
-    setupStage();
+    // 配牌（裏面）
+    setupCards();
 }
 
-async function setupStage() {
+async function setupCards() {
     const problem = gameQueue[currentRound];
     
     // リール作成
@@ -734,9 +772,9 @@ async function setupStage() {
         wrapper.onclick = () => handleCardClick(index, wrapper);
 
         const back = document.createElement("div");
-        back.className = "card-face card-back"; // 裏面 (0deg)
+        back.className = "card-face card-back"; 
         const front = document.createElement("div");
-        front.className = "card-face card-front"; // 表面 (180deg)
+        front.className = "card-face card-front";
         front.textContent = char;
 
         wrapper.appendChild(back);
@@ -745,26 +783,61 @@ async function setupStage() {
         cardElements.push(wrapper);
     });
 
-    // 配るアニメーション
+    // 着地アニメーション
     for (let i = 0; i < cardElements.length; i++) {
         await wait(100);
         cardElements[i].classList.add("dealt");
     }
 
-    await wait(500);
+    await wait(300);
+    doorMessage.textContent = "PLACE YOUR BET";
     
-    // オープン (Flippedクラス付与で180度回転して表面へ)
-    doorMessage.textContent = "BET TIME!!";
-    cardElements.forEach(card => card.classList.add("flipped"));
+    // ベットUI表示
+    showBetUI();
+}
 
-    // ゲーム開始
+// --- フェーズ1: ベット額決定 ---
+function showBetUI() {
+    betControls.classList.remove("hidden");
+    
+    // 所持金不足のボタンを無効化
+    const btns = document.querySelectorAll(".chip-btn");
+    btns.forEach(btn => {
+        const amount = parseInt(btn.textContent);
+        if (currentChips < amount) {
+            btn.disabled = true;
+        } else {
+            btn.disabled = false;
+        }
+    });
+
+    // 最小ベット払えないなら破産
+    if (currentChips < 10) {
+        setTimeout(() => {
+            showFinalResult();
+        }, 500);
+    }
+}
+
+function confirmBet(amount) {
+    if (currentChips < amount) return;
+    currentBetAmount = amount;
+    
+    betControls.classList.add("hidden");
+    decisionControls.classList.remove("hidden");
+    updateCostDisplay();
+
+    const cards = document.querySelectorAll(".card-wrapper");
+    cards.forEach(card => card.classList.add("flipped"));
+
+    doorMessage.textContent = `BET: ${currentBetAmount}`;
+    
     isGameActive = true;
-    betBtn.disabled = false;
     timerBar.style.backgroundColor = "#00ff00";
     startTimer();
 }
 
-// --- タイマー & 選択ロジック ---
+// --- フェーズ2: カード選択 ---
 function startTimer() {
     timeLeft = 10.0;
     if (timerInterval) clearInterval(timerInterval);
@@ -786,29 +859,52 @@ function startTimer() {
 function handleTimeOver() {
     isGameActive = false;
     doorMessage.textContent = "TIME OVER";
-    if (selectedIndices.length > 0) execBet(true);
-    else forceLose();
+    decideBtn.disabled = true;
+
+    if (selectedIndices.length === 0) {
+        const problem = gameQueue[currentRound];
+        const penalty = problem.hiragana.length * currentBetAmount;
+        currentChips -= penalty;
+        showResultModal("TIME OVER", -penalty, `未選択ペナルティ\n(全文字数 × BET)`);
+    } else {
+        execDecision();
+    }
 }
 
 function handleCardClick(index, element) {
     if (!isGameActive) return;
+
+    let newSelection = [];
     if (selectedIndices.length === 0) {
-        selectedIndices.push(index);
+        newSelection = [index];
     } else {
         const min = Math.min(...selectedIndices);
         const max = Math.max(...selectedIndices);
         if (index >= min - 1 && index <= max + 1) {
             const newMin = Math.min(min, index);
             const newMax = Math.max(max, index);
-            selectedIndices = [];
             for (let i = newMin; i <= newMax; i++) {
-                selectedIndices.push(i);
+                newSelection.push(i);
             }
         } else {
-            selectedIndices = [index];
+            newSelection = [index];
         }
     }
+
+    const cost = newSelection.length * currentBetAmount;
+    if (cost > currentChips) {
+        doorMessage.textContent = "INSUFFICIENT FUNDS!";
+        doorMessage.style.color = "#ff4444";
+        setTimeout(() => {
+            doorMessage.textContent = `BET: ${currentBetAmount}`;
+            doorMessage.style.color = "#daa520";
+        }, 1000);
+        return;
+    }
+
+    selectedIndices = newSelection;
     updateCardSelection();
+    updateCostDisplay();
 }
 
 function updateCardSelection() {
@@ -817,27 +913,34 @@ function updateCardSelection() {
         const idx = parseInt(w.dataset.index);
         w.classList.toggle("selected", selectedIndices.includes(idx));
     });
+    
+    decideBtn.disabled = (selectedIndices.length === 0);
 }
 
-function forceLose() {
-    const penalty = hasWonBefore ? Math.floor(currentScore / 2) : 0;
-    currentScore -= penalty;
-    showResultModal("TIME OVER", -penalty, "時間切れ (没収)");
+function updateCostDisplay() {
+    const count = selectedIndices.length;
+    const cost = count * currentBetAmount;
+    costDisplay.textContent = `COST: ${cost}`;
 }
 
-// --- ベット実行・演出フロー ---
-async function execBet(isForced = false) {
-    if (!isGameActive && !isForced) return;
+// --- フェーズ3: 決済 & 判定 ---
+async function execDecision() {
     if (selectedIndices.length === 0) return;
 
     isGameActive = false;
     clearInterval(timerInterval);
-    betBtn.disabled = true;
+    decideBtn.disabled = true;
+
+    const cost = selectedIndices.length * currentBetAmount;
+    currentChips -= cost;
+    updateHUD();
+
     doorMessage.textContent = "JUDGEMENT...";
 
     await wait(500);
     doorOverlay.classList.add("open");
     await wait(800);
+    
     await absorbCards();
 }
 
@@ -857,7 +960,6 @@ async function absorbCards() {
         });
 
         await animateAbsorb(cardElements, targetReel);
-
         targetReel.classList.add("power-on");
         activeReelData.push({ element: targetReel, data: sol });
     }
@@ -870,18 +972,13 @@ function animateAbsorb(cards, targetReel) {
     return new Promise(resolve => {
         if (cards.length === 0) { resolve(); return; }
         const reelRect = targetReel.getBoundingClientRect();
-
         cards.forEach((card, idx) => {
             const cardRect = card.getBoundingClientRect();
             const deltaX = (reelRect.left + reelRect.width/2) - (cardRect.left + cardRect.width/2);
             const deltaY = (reelRect.top + reelRect.height/2) - (cardRect.top + cardRect.height/2);
-
             card.style.transition = `transform ${ABSORB_DURATION}ms ease-in, opacity ${ABSORB_DURATION}ms ease-in`;
             card.style.zIndex = 100;
-            
             requestAnimationFrame(() => {
-                // 吸収時は裏返るのではなく、そのまま小さくなって消える
-                // 現在のflipped状態(180deg)を維持しつつ移動・縮小
                 card.style.transform = `translate(${deltaX}px, ${deltaY}px) rotateY(180deg) scale(0.2)`;
                 card.style.opacity = "0";
             });
@@ -891,15 +988,18 @@ function animateAbsorb(cards, targetReel) {
 }
 
 function runAllReels(reelDataList) {
+    // 【修正】事前にバッティングを計算
     const allStrokes = reelDataList.map(r => r.data.strokes);
-    const maxStroke = Math.max(...allStrokes);
-    
+    const strokeCounts = {};
+    allStrokes.forEach(s => { strokeCounts[s] = (strokeCounts[s] || 0) + 1; });
+
     const promises = reelDataList.map(item => {
         return new Promise(resolve => {
             let count = 0;
             const target = item.data.strokes;
             const valueEl = item.element.querySelector(".reel-value");
             const kanjiEl = item.element.querySelector(".reel-kanji");
+            const isBatting = strokeCounts[target] > 1; // バッティングしているか？
 
             const counter = setInterval(() => {
                 count++;
@@ -908,103 +1008,114 @@ function runAllReels(reelDataList) {
                     clearInterval(counter);
                     kanjiEl.textContent = item.data.kanji;
                     item.element.classList.add("finished");
+                    
+                    // 【修正】止まった瞬間にバッティング判定をして赤くする
+                    if (isBatting) {
+                        item.element.classList.add("batting");
+                    }
+                    
                     resolve();
                 }
             }, COUNT_SPEED);
         });
     });
 
-    const waitTime = maxStroke * COUNT_SPEED + 1000;
+    const tempMax = Math.max(...reelDataList.map(r=>r.data.strokes));
+    const waitTime = tempMax * COUNT_SPEED + 1000;
     setTimeout(() => {
-        finalizeScore(maxStroke);
+        finalizeScore();
     }, waitTime);
 }
 
-// 判定ロジック (アップデート版: 重複=0pt)
-function finalizeScore(maxStroke) {
+// --- 最終結果計算（演出タメを追加） ---
+async function finalizeScore() {
     const problem = gameQueue[currentRound];
     const allStrokes = problem.solutions.map(s => s.strokes);
 
-    // 全ての画数の出現回数をカウント
+    // 画数カウント
     const strokeCounts = {};
-    allStrokes.forEach(s => {
-        strokeCounts[s] = (strokeCounts[s] || 0) + 1;
-    });
+    allStrokes.forEach(s => { strokeCounts[s] = (strokeCounts[s] || 0) + 1; });
 
-    // ユーザーの選択判定
+    // ボーナス対象決定
+    let bonusTargetStroke = -1;
+    const uniqueStrokesDesc = [...new Set(allStrokes)].sort((a, b) => b - a);
+    for (const s of uniqueStrokesDesc) {
+        if (strokeCounts[s] === 1) {
+            bonusTargetStroke = s;
+            break; 
+        }
+    }
+
+    // ユーザー選択確認
     const userJson = JSON.stringify(selectedIndices.sort((a,b)=>a-b));
     let hitSolution = null;
     problem.solutions.forEach(sol => {
         if (JSON.stringify(sol.range) === userJson) hitSolution = sol;
     });
 
-    let diff = 0;
+    // バッティング発生フラグ（待機時間の制御用）
+    let hasBatting = false;
+    allStrokes.forEach(s => {
+        if (strokeCounts[s] > 1) hasBatting = true;
+    });
+
+    await wait(1000);
+
+    // 計算処理
+    let returnAmount = 0;
     let title = "";
     let detail = "";
-
-    // 演出: 重複しているリール（バッティング）を全て赤くする
-    const reels = document.querySelectorAll(".reel");
-    problem.solutions.forEach((sol, i) => {
-        if (strokeCounts[sol.strokes] > 1) {
-            reels[i].style.borderColor = "#ff4444";
-            reels[i].style.color = "#ff4444";
-        }
-    });
+    const cost = selectedIndices.length * currentBetAmount;
 
     if (hitSolution) {
         const basePt = hitSolution.strokes;
-        const isMax = (basePt === maxStroke);
-        const isDuplicate = strokeCounts[basePt] > 1; // その画数が重複しているか？
+        const isDuplicate = strokeCounts[basePt] > 1;
 
         if (isDuplicate) {
-            // 画数が被っていたら、最大・非最大に関わらず没収
-            diff = 0;
-            title = "BAT OUT!!";
-            detail = `画数(${basePt})が重複しているため没収！`;
-        } else if (isMax) {
-            // 重複なし、かつ最大
-            diff = basePt + 3;
-            title = "JACKPOT!!";
-            detail = `${hitSolution.kanji}(${basePt}) + ボーナス(3)`;
+            returnAmount = 0;
+            title = "BAT OUT";
+            detail = `画数(${basePt})重複により没収\nCOST -${cost}`;
         } else {
-            // 重複なし、通常正解
-            diff = basePt;
-            title = "WIN";
-            detail = `漢字：${hitSolution.kanji} (${basePt}pt)`;
+            let grossReturn = currentBetAmount * basePt;
+            let note = "";
+            
+            if (bonusTargetStroke !== -1 && basePt === bonusTargetStroke) {
+                grossReturn = Math.floor(grossReturn * MAX_BONUS_RATE);
+                note = "\nMAX BONUS x1.2";
+                title = "JACKPOT!!";
+            } else {
+                title = "WIN";
+            }
+
+            returnAmount = grossReturn;
+            detail = `画数${basePt} × BET${currentBetAmount}${note}`;
         }
-        hasWonBefore = true;
     } else {
-        // 区切り不正解
-        if (hasWonBefore) {
-            const penalty = Math.floor(currentScore / 2);
-            diff = -penalty;
-            title = "LOSE...";
-            detail = `区切り不正解 (-${penalty}pt)`;
-        } else {
-            diff = 0;
-            title = "SAFE";
-            detail = "区切り不正解 (初回ペナルティなし)";
-        }
+        returnAmount = 0;
+        title = "INVALID";
+        detail = `区切り不正解\nCOST -${cost}`;
     }
 
-    currentScore += diff;
-    showResultModal(title, diff, detail);
+    currentChips += returnAmount;
+    
+    const profit = returnAmount - cost;
+    showResultModal(title, profit, detail);
 }
 
-function showResultModal(title, diff, detail) {
+function showResultModal(title, profit, detail) {
     const titleEl = document.getElementById("result-title");
     const diffEl = document.getElementById("score-diff");
     const detailEl = document.getElementById("result-detail");
     
     titleEl.textContent = title;
-    detailEl.textContent = detail;
+    detailEl.innerText = detail;
     
-    if (diff > 0) {
-        diffEl.textContent = "+" + diff;
+    if (profit > 0) {
+        diffEl.textContent = "+" + profit;
         diffEl.style.color = "#daa520";
         titleEl.style.color = "#daa520";
-    } else if (diff < 0) {
-        diffEl.textContent = diff;
+    } else if (profit < 0) {
+        diffEl.textContent = profit;
         diffEl.style.color = "#ff4444";
         titleEl.style.color = "#ff4444";
     } else {
@@ -1017,8 +1128,20 @@ function showResultModal(title, diff, detail) {
     resultOverlay.classList.remove("hidden");
 }
 
+function showFinalResult() {
+    finalScoreDisplay.textContent = Math.floor(currentChips);
+    
+    let listText = "";
+    playedProblems.forEach((prob, idx) => {
+        listText += `R${idx+1}: ${prob.text} (読み: ${prob.hiragana.join("")})\n`;
+    });
+    problemListBox.value = listText;
+
+    finalResultOverlay.classList.add("open");
+}
+
 function updateHUD() {
-    scoreDisplay.textContent = Math.floor(currentScore);
+    chipsDisplay.textContent = Math.floor(currentChips);
 }
 
 function nextRound() {
