@@ -33,8 +33,6 @@
 
 ## 🛠 技術スタック
 
-フレームワークを使用せず、軽量な構成で動作します。
-
 - **HTML5**
 - **CSS3** (Flexbox, Grid, CSS Animation, 3D Transform)
 - **JavaScript** (ES6+, Vanilla JS)
@@ -47,3 +45,18 @@
 ├── style.css       # デザイン・アニメーション定義
 ├── script.js       # ゲームロジック・問題データ
 └── README.md       # 本ファイル
+
+```
+
+## ⚠️ 注意事項
+
+* 本ゲームにおける漢字の画数は、一般的な「常用漢字」の画数を基準としていますが、旧字体や異体字の扱いにより辞書と異なる場合があります。
+* バッティング判定は「画数」の一致で行われます。（違う漢字でも画数が同じなら没収対象です）
+
+## 📄 License
+
+This project is open source and available under the [MIT License](https://www.google.com/search?q=LICENSE).
+
+```
+
+```
