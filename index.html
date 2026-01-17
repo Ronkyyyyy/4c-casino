@@ -14,10 +14,12 @@
         <div class="rules-box">
             <h3>【ルール】</h3>
             <ul>
-                <li>全10ラウンド。問題はランダムに出題される。</li>
-                <li><strong>「扉」</strong>の向こうにある漢字の画数を予想せよ。</li>
-                <li>的中すれば画数を獲得。最大画数ならボーナス<strong>+3pt</strong>。</li>
-                <li>最大画数が重複すると<strong>没収(0pt)</strong>。</li>
+                <li><strong>「文字数(コスト)」</strong>と<strong>「画数(リターン)」</strong>を見極めろ。</li>
+                <li>裏向きのカードを見てBET額を決定。</li>
+                <li>選択した<strong>「枚数 × BET額」</strong>を支払って勝負。</li>
+                <li>的中すれば<strong>「BET額 × 画数」</strong>のチップを獲得。</li>
+                <li><strong>単独で最大画数</strong>なら1.2倍ボーナス。（最大が重複時は次点が繰り上げ）</li>
+                <li>バッティング（重複）は<strong>没収</strong>。時間切れは<strong>重罰</strong>。</li>
             </ul>
         </div>
         <button id="start-btn" onclick="startGameFromHome()">GAME START</button>
@@ -27,7 +29,7 @@
 <div class="casino-table">
     <header>
         <div class="logo-small">四字熟語 CASINO</div>
-        <div class="score-box">CHIP: <span id="current-score">0</span> pt</div>
+        <div class="score-box">CHIP: <span id="current-chips">500</span></div>
     </header>
 
     <main>
@@ -41,7 +43,7 @@
                     <div class="timer-frame">
                         <div id="timer-bar"></div>
                     </div>
-                    <div id="door-message">READY...</div>
+                    <div id="door-message">DEALING...</div>
                 </div>
             </div>
         </div>
@@ -49,7 +51,22 @@
         <div id="card-area"></div>
 
         <div class="action-area">
-            <button id="bet-btn" onclick="execBet()" disabled>BET!!</button>
+            
+            <div id="bet-controls" class="hidden">
+                <div class="bet-label">SELECT BET AMOUNT</div>
+                <div class="chip-buttons">
+                    <button class="chip-btn" onclick="confirmBet(10)">10</button>
+                    <button class="chip-btn" onclick="confirmBet(50)">50</button>
+                    <button class="chip-btn" onclick="confirmBet(100)">100</button>
+                    <button class="chip-btn" onclick="confirmBet(500)">500</button>
+                </div>
+            </div>
+
+            <div id="decision-controls" class="hidden">
+                <div id="cost-display">COST: 0</div>
+                <button id="decide-btn" onclick="execDecision()" disabled>PAY & JUDGE</button>
+            </div>
+
         </div>
     </main>
 
@@ -61,6 +78,22 @@
             <button onclick="nextRound()" id="next-btn">NEXT ROUND</button>
         </div>
     </div>
+
+    <div id="final-result-overlay">
+        <div class="final-result-content">
+            <h2>GAME FINISHED</h2>
+            <div class="final-score-label">FINAL CHIP</div>
+            <div id="final-score-display" class="final-score">0</div>
+            
+            <div class="final-list-area">
+                <h3>出題リスト (コピー可)</h3>
+                <textarea id="problem-list-box" readonly onclick="this.select()"></textarea>
+            </div>
+            
+            <button id="back-to-home-btn" onclick="location.reload()">TITLEへ戻る</button>
+        </div>
+    </div>
+
 </div>
 
 <script src="script.js"></script>
