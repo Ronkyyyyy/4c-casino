@@ -29,7 +29,7 @@
 <div class="casino-table">
     <header>
         <div class="logo-small">四字熟語 CASINO</div>
-        <div class="score-box">CHIP: <span id="current-chips">500</span></div>
+        <div class="score-box">CHIP: <span id="current-chips">1000</span></div>
     </header>
 
     <main>
@@ -55,10 +55,10 @@
             <div id="bet-controls" class="hidden">
                 <div class="bet-label">SELECT BET AMOUNT</div>
                 <div class="chip-buttons">
-                    <button class="chip-btn" onclick="confirmBet(10)">10</button>
                     <button class="chip-btn" onclick="confirmBet(50)">50</button>
                     <button class="chip-btn" onclick="confirmBet(100)">100</button>
                     <button class="chip-btn" onclick="confirmBet(500)">500</button>
+                    <button class="chip-btn" onclick="confirmBet(5000)">5k</button>
                 </div>
             </div>
 
@@ -66,6 +66,8 @@
                 <div id="cost-display">COST: 0</div>
                 <button id="decide-btn" onclick="execDecision()" disabled>PAY & JUDGE</button>
             </div>
+
+            <button id="skip-btn" class="hidden" onclick="skipAnimation()">SKIP ▶▶</button>
 
         </div>
     </main>
