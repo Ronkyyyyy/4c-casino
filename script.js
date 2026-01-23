@@ -631,9 +631,9 @@ const PROBLEM_POOL = [
 ];
 
 // --- 設定 ---
-const INIT_CHIPS = 500;
+const INIT_CHIPS = 500; 
 const MAX_BONUS_RATE = 1.2;
-const COUNT_SPEED = 800; // 緊迫感維持のため遅め
+const COUNT_SPEED = 800; 
 const ABSORB_DURATION = 600; 
 const TOTAL_ROUNDS = 10;
 
@@ -648,6 +648,11 @@ let selectedIndices = [];
 let timerInterval = null;
 let timeLeft = 10.0;
 let isGameActive = false;
+
+// スキップ制御用
+let reelIntervals = [];
+let finalizeTimer = null;
+let activeReelData = []; 
 
 // DOM
 const reelContainer = document.getElementById("reel-container");
@@ -664,6 +669,7 @@ const betControls = document.getElementById("bet-controls");
 const decisionControls = document.getElementById("decision-controls");
 const costDisplay = document.getElementById("cost-display");
 const decideBtn = document.getElementById("decide-btn");
+const skipBtn = document.getElementById("skip-btn"); 
 
 const finalResultOverlay = document.getElementById("final-result-overlay");
 const finalScoreDisplay = document.getElementById("final-score-display");
@@ -692,7 +698,6 @@ function initGame() {
     currentRound = 0;
     playedProblems = []; 
     
-    // リザルト画面を確実に閉じる
     finalResultOverlay.classList.remove("open");
     resultOverlay.classList.add("hidden");
 
@@ -710,19 +715,16 @@ function initGame() {
 }
 
 function startRound() {
-    // 終了判定
     if (currentRound >= TOTAL_ROUNDS || currentChips <= 0) {
         showFinalResult();
         return;
     }
 
-    // 安全策
     if (!gameQueue[currentRound]) {
         showFinalResult();
         return;
     }
 
-    // 履歴に追加
     playedProblems.push(gameQueue[currentRound]);
 
     // リセット
@@ -730,29 +732,31 @@ function startRound() {
     isGameActive = false;
     currentBetAmount = 0;
     
+    // スキップ関連リセット
+    reelIntervals.forEach(clearInterval);
+    reelIntervals = [];
+    if (finalizeTimer) clearTimeout(finalizeTimer);
+    activeReelData = [];
+    
     timerBar.style.width = "100%";
     timerBar.style.backgroundColor = "#555";
     resultOverlay.classList.add("hidden");
+    skipBtn.classList.add("hidden"); 
     
-    // UI切り替え
     betControls.classList.add("hidden");
     decisionControls.classList.add("hidden");
     
-    // 扉を閉じる
     doorOverlay.classList.remove("open");
     doorMessage.textContent = "DEALING...";
     roundDisplay.textContent = `ROUND ${String(currentRound + 1).padStart(2, '0')}/${TOTAL_ROUNDS}`;
     
     updateHUD();
-    
-    // 配牌（裏面）
     setupCards();
 }
 
 async function setupCards() {
     const problem = gameQueue[currentRound];
     
-    // リール作成
     reelContainer.innerHTML = "";
     problem.solutions.forEach(sol => {
         const reel = document.createElement("div");
@@ -761,7 +765,6 @@ async function setupCards() {
         reelContainer.appendChild(reel);
     });
 
-    // カード作成
     cardArea.innerHTML = "";
     const cardElements = [];
     problem.hiragana.forEach((char, index) => {
@@ -783,7 +786,6 @@ async function setupCards() {
         cardElements.push(wrapper);
     });
 
-    // 着地アニメーション
     for (let i = 0; i < cardElements.length; i++) {
         await wait(100);
         cardElements[i].classList.add("dealt");
@@ -791,8 +793,6 @@ async function setupCards() {
 
     await wait(300);
     doorMessage.textContent = "PLACE YOUR BET";
-    
-    // ベットUI表示
     showBetUI();
 }
 
@@ -800,9 +800,15 @@ async function setupCards() {
 function showBetUI() {
     betControls.classList.remove("hidden");
     
-    // 所持金不足のボタンを無効化
     const btns = document.querySelectorAll(".chip-btn");
     btns.forEach(btn => {
+        // "5k"ボタンの特別処理
+        if(btn.innerText === "5k") {
+             if(currentChips < 5000) btn.disabled = true;
+             else btn.disabled = false;
+             return;
+        }
+
         const amount = parseInt(btn.textContent);
         if (currentChips < amount) {
             btn.disabled = true;
@@ -810,9 +816,9 @@ function showBetUI() {
             btn.disabled = false;
         }
     });
-
-    // 最小ベット払えないなら破産
-    if (currentChips < 10) {
+    
+    // 最小ベット(50)すら払えないなら破産
+    if (currentChips < 50) {
         setTimeout(() => {
             showFinalResult();
         }, 500);
@@ -947,7 +953,7 @@ async function execDecision() {
 async function absorbCards() {
     const problem = gameQueue[currentRound];
     const reels = document.querySelectorAll(".reel");
-    const activeReelData = [];
+    activeReelData = []; 
 
     for (let i = 0; i < problem.solutions.length; i++) {
         const sol = problem.solutions[i];
@@ -987,56 +993,86 @@ function animateAbsorb(cards, targetReel) {
     });
 }
 
+// リール回転アニメーション（スキップ対応）
 function runAllReels(reelDataList) {
-    // 【修正】事前にバッティングを計算
     const allStrokes = reelDataList.map(r => r.data.strokes);
     const strokeCounts = {};
     allStrokes.forEach(s => { strokeCounts[s] = (strokeCounts[s] || 0) + 1; });
 
-    const promises = reelDataList.map(item => {
-        return new Promise(resolve => {
-            let count = 0;
-            const target = item.data.strokes;
-            const valueEl = item.element.querySelector(".reel-value");
-            const kanjiEl = item.element.querySelector(".reel-kanji");
-            const isBatting = strokeCounts[target] > 1; // バッティングしているか？
+    skipBtn.classList.remove("hidden");
 
-            const counter = setInterval(() => {
-                count++;
-                valueEl.textContent = count;
-                if (count >= target) {
-                    clearInterval(counter);
-                    kanjiEl.textContent = item.data.kanji;
-                    item.element.classList.add("finished");
-                    
-                    // 【修正】止まった瞬間にバッティング判定をして赤くする
-                    if (isBatting) {
-                        item.element.classList.add("batting");
-                    }
-                    
-                    resolve();
+    reelDataList.forEach(item => {
+        let count = 0;
+        const target = item.data.strokes;
+        const valueEl = item.element.querySelector(".reel-value");
+        const kanjiEl = item.element.querySelector(".reel-kanji");
+        const isBatting = strokeCounts[target] > 1;
+
+        const intervalId = setInterval(() => {
+            count++;
+            valueEl.textContent = count;
+            if (count >= target) {
+                clearInterval(intervalId);
+                kanjiEl.textContent = item.data.kanji;
+                item.element.classList.add("finished");
+                if (isBatting) {
+                    item.element.classList.add("batting");
                 }
-            }, COUNT_SPEED);
-        });
+            }
+        }, COUNT_SPEED);
+        
+        reelIntervals.push(intervalId);
     });
 
     const tempMax = Math.max(...reelDataList.map(r=>r.data.strokes));
     const waitTime = tempMax * COUNT_SPEED + 1000;
-    setTimeout(() => {
-        finalizeScore();
+    
+    finalizeTimer = setTimeout(() => {
+        skipBtn.classList.add("hidden"); 
+        finalizeScore(false); // 通常終了
     }, waitTime);
 }
 
-// --- 最終結果計算（演出タメを追加） ---
-async function finalizeScore() {
-    const problem = gameQueue[currentRound];
-    const allStrokes = problem.solutions.map(s => s.strokes);
+// スキップ機能
+function skipAnimation() {
+    reelIntervals.forEach(clearInterval);
+    reelIntervals = [];
+    if (finalizeTimer) clearTimeout(finalizeTimer);
+    
+    skipBtn.classList.add("hidden");
 
-    // 画数カウント
+    const allStrokes = activeReelData.map(r => r.data.strokes);
     const strokeCounts = {};
     allStrokes.forEach(s => { strokeCounts[s] = (strokeCounts[s] || 0) + 1; });
 
-    // ボーナス対象決定
+    activeReelData.forEach(item => {
+        const target = item.data.strokes;
+        const valueEl = item.element.querySelector(".reel-value");
+        const kanjiEl = item.element.querySelector(".reel-kanji");
+        const isBatting = strokeCounts[target] > 1;
+
+        valueEl.textContent = target;
+        kanjiEl.textContent = item.data.kanji;
+        item.element.classList.add("finished");
+        if (isBatting) {
+            item.element.classList.add("batting");
+        }
+    });
+
+    setTimeout(() => {
+        finalizeScore(true); // スキップ経由
+    }, 100);
+}
+
+// 最終結果計算（スキップ引数追加）
+async function finalizeScore(isSkipped) {
+    const problem = gameQueue[currentRound];
+    const allStrokes = problem.solutions.map(s => s.strokes);
+
+    const strokeCounts = {};
+    allStrokes.forEach(s => { strokeCounts[s] = (strokeCounts[s] || 0) + 1; });
+
+    // ボーナス対象
     let bonusTargetStroke = -1;
     const uniqueStrokesDesc = [...new Set(allStrokes)].sort((a, b) => b - a);
     for (const s of uniqueStrokesDesc) {
@@ -1046,22 +1082,27 @@ async function finalizeScore() {
         }
     }
 
-    // ユーザー選択確認
+    // ユーザー選択
     const userJson = JSON.stringify(selectedIndices.sort((a,b)=>a-b));
     let hitSolution = null;
     problem.solutions.forEach(sol => {
         if (JSON.stringify(sol.range) === userJson) hitSolution = sol;
     });
 
-    // バッティング発生フラグ（待機時間の制御用）
+    // 演出待機時間
     let hasBatting = false;
     allStrokes.forEach(s => {
         if (strokeCounts[s] > 1) hasBatting = true;
     });
 
-    await wait(1000);
+    if (!isSkipped) {
+        if (hasBatting) await wait(2500);
+        else await wait(1000);
+    } else {
+        await wait(500); 
+    }
 
-    // 計算処理
+    // 計算
     let returnAmount = 0;
     let title = "";
     let detail = "";
