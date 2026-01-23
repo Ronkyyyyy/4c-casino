@@ -154,6 +154,15 @@ header {
 #decide-btn:active { box-shadow: 0 2px 0 #500000; transform: translateY(4px); }
 #decide-btn:disabled { background: #444; box-shadow: none; cursor: not-allowed; opacity: 0.5; }
 
+/* スキップボタン */
+#skip-btn {
+    margin-top: 10px;
+    padding: 8px 20px; background: #333; color: #fff; border: 1px solid #aaa;
+    border-radius: 4px; cursor: pointer; font-size: 0.9rem; letter-spacing: 2px;
+    transition: background 0.2s;
+}
+#skip-btn:hover { background: #555; }
+
 /* --- リール --- */
 .reel {
     width: 50px; height: 80px; background: #111; color: #333;
@@ -176,7 +185,7 @@ header {
 }
 .reel.finished .reel-kanji { opacity: 1; color: #333; font-weight: bold; }
 
-/* バッティング時のスタイル（赤色表示） */
+/* バッティング時のスタイル */
 .reel.batting {
     background: #500000 !important;
     border-color: #ff4444 !important;
@@ -195,22 +204,16 @@ header {
 .score-diff { font-size: 3rem; font-weight: bold; margin: 20px 0; color: #daa520; }
 #next-btn { padding: 10px 30px; font-size: 1.2rem; background: #daa520; border: none; cursor: pointer; border-radius: 5px; }
 
-/* --- 総合リザルトモーダル（修正済） --- */
+/* 総合リザルトモーダル */
 #final-result-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.95); z-index: 110;
-    
-    /* デフォルトは非表示 */
     display: none; 
-    
     justify-content: center; align-items: center; flex-direction: column;
     padding: 20px; box-sizing: border-box;
 }
 
-/* openクラスがついた時だけ表示 */
-#final-result-overlay.open {
-    display: flex;
-}
+#final-result-overlay.open { display: flex; }
 
 .final-result-content {
     text-align: center; color: #fff;
