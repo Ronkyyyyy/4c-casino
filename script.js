@@ -628,7 +628,493 @@ const PROBLEM_POOL = [
         ]
     },
 // --- 2026.01.17作成 ---
+    {
+        id: 58,
+        text: "相思相愛",
+        hiragana: ["そ", "う", "し", "そ", "う", "あ", "い"],
+        solutions: [
+            { range: [0, 1], kanji: "相", strokes: 9 },
+            { range: [2], kanji: "思", strokes: 9 },
+            { range: [3, 4], kanji: "相", strokes: 9 },
+            { range: [5, 6], kanji: "愛", strokes: 13 }
+        ]
+    },
+    {
+        id: 59,
+        text: "雲散霧消",
+        hiragana: ["う", "さ", "ん", "む", "し", "ょ", "う"],
+        solutions: [
+            { range: [0], kanji: "雲", strokes: 12 },
+            { range: [1, 2], kanji: "散", strokes: 12 },
+            { range: [3], kanji: "霧", strokes: 19 },
+            { range: [4, 5, 6], kanji: "消", strokes: 10 }
+        ]
+    },
+    {
+        id: 60,
+        text: "有名無実",
+        hiragana: ["ゆ", "う", "め", "い", "む", "じ", "つ"],
+        solutions: [
+            { range: [0, 1], kanji: "有", strokes: 6 },
+            { range: [2, 3], kanji: "名", strokes: 6 },
+            { range: [4], kanji: "無", strokes: 12 },
+            { range: [5, 6], kanji: "実", strokes: 8 }
+        ]
+    },
+    {
+        id: 61,
+        text: "意気投合",
+        hiragana: ["い", "き", "と", "う", "ご", "う"],
+        solutions: [
+            { range: [0], kanji: "意", strokes: 13 },
+            { range: [1], kanji: "気", strokes: 6 },
+            { range: [2, 3], kanji: "投", strokes: 7 },
+            { range: [4, 5], kanji: "合", strokes: 6 }
+        ]
+    },
+    {
+        id: 62,
+        text: "粉骨砕身",
+        hiragana: ["ふ", "ん", "こ", "つ", "さ", "い", "し", "ん"],
+        solutions: [
+            { range: [0, 1], kanji: "粉", strokes: 10 },
+            { range: [2, 3], kanji: "骨", strokes: 10 },
+            { range: [4, 5], kanji: "砕", strokes: 9 },
+            { range: [6, 7], kanji: "身", strokes: 7 }
+        ]
+    },
+    {
+        id: 63,
+        text: "切磋琢磨",
+        hiragana: ["せ", "っ", "さ", "た", "く", "ま"],
+        solutions: [
+            { range: [0, 1], kanji: "切", strokes: 4 },
+            { range: [2], kanji: "磋", strokes: 15 },
+            { range: [3, 4], kanji: "琢", strokes: 11 },
+            { range: [5], kanji: "磨", strokes: 16 }
+        ]
+    },
+    {
+        id: 64,
+        text: "森羅万象",
+        hiragana: ["し", "ん", "ら", "ば", "ん", "し", "ょ", "う"],
+        solutions: [
+            { range: [0, 1], kanji: "森", strokes: 12 },
+            { range: [2], kanji: "羅", strokes: 19 },
+            { range: [3, 4], kanji: "万", strokes: 3 },
+            { range: [5, 6, 7], kanji: "象", strokes: 12 }
+        ]
+    },
+    {
+        id: 65,
+        text: "跳梁跋扈",
+        hiragana: ["ち", "ょ", "う", "り", "ょ", "う", "ば", "っ", "こ"],
+        solutions: [
+            { range: [0, 1, 2], kanji: "跳", strokes: 13 },
+            { range: [3, 4, 5], kanji: "梁", strokes: 11 },
+            { range: [6, 7], kanji: "跋", strokes: 12 },
+            { range: [8], kanji: "扈", strokes: 11 }
+        ]
+    },
+    {
+        id: 66,
+        text: "七転八倒",
+        hiragana: ["し", "ち", "て", "ん", "ば", "っ", "と", "う"],
+        solutions: [
+            { range: [0, 1], kanji: "七", strokes: 2 },
+            { range: [2, 3], kanji: "転", strokes: 11 },
+            { range: [4, 5], kanji: "八", strokes: 2 },
+            { range: [6, 7], kanji: "倒", strokes: 10 }
+        ]
+    },
+    {
+        id: 67,
+        text: "疾風怒濤",
+        hiragana: ["し", "っ", "ぷ", "う", "ど", "と", "う"],
+        solutions: [
+            { range: [0, 1], kanji: "疾", strokes: 10 },
+            { range: [2, 3], kanji: "風", strokes: 9 },
+            { range: [4], kanji: "怒", strokes: 9 },
+            { range: [5, 6], kanji: "濤", strokes: 17 }
+        ]
+    },
+    {
+        id: 68,
+        text: "創痍未癒",
+        hiragana: ["そ", "う", "い", "み", "ゆ"],
+        solutions: [
+            { range: [0, 1], kanji: "創", strokes: 12 },
+            { range: [2], kanji: "痍", strokes: 11 },
+            { range: [3], kanji: "未", strokes: 5 },
+            { range: [4], kanji: "癒", strokes: 18 }
+        ]
+    },
+    {
+        id: 69,
+        text: "雌雄未決",
+        hiragana: ["し", "ゆ", "う", "み", "け", "つ"],
+        solutions: [
+            { range: [0], kanji: "雌", strokes: 14 },
+            { range: [1, 2], kanji: "雄", strokes: 12 },
+            { range: [3], kanji: "未", strokes: 5 },
+            { range: [4, 5], kanji: "決", strokes: 7 }
+        ]
+    },
+    {
+        id: 70,
+        text: "孤雌寡鶴",
+        hiragana: ["こ", "し", "か", "か", "く"],
+        solutions: [
+            { range: [0], kanji: "孤", strokes: 9 },
+            { range: [1], kanji: "雌", strokes: 14 },
+            { range: [2], kanji: "寡", strokes: 14 },
+            { range: [3, 4], kanji: "鶴", strokes: 21 }
+        ]
+    },
+    {
+        id: 71,
+        text: "苦心孤詣",
+        hiragana: ["く", "し", "ん", "こ", "け", "い"],
+        solutions: [
+            { range: [0], kanji: "苦", strokes: 8 },
+            { range: [1, 2], kanji: "心", strokes: 4 },
+            { range: [3], kanji: "孤", strokes: 9 },
+            { range: [4, 5], kanji: "詣", strokes: 13 }
+        ]
+    },
+    {
+        id: 72,
+        text: "一韻到底",
+        hiragana: ["い", "ち", "い", "ん", "と", "う", "て", "い"],
+        solutions: [
+            { range: [0, 1], kanji: "一", strokes: 1 },
+            { range: [2, 3], kanji: "韻", strokes: 19 },
+            { range: [4, 5], kanji: "到", strokes: 8 },
+            { range: [6, 7], kanji: "底", strokes: 8 }
+        ]
+    },
+    {
+        id: 73,
+        text: "海底撈月",
+        hiragana: ["か", "い", "て", "い", "ろ", "う", "げ", "つ"],
+        solutions: [
+            { range: [0, 1], kanji: "海", strokes: 9 },
+            { range: [2, 3], kanji: "底", strokes: 8 },
+            { range: [4, 5], kanji: "撈", strokes: 15 },
+            { range: [6, 7], kanji: "月", strokes: 4 }
+        ]
+    },
+    {
+        id: 74,
+        text: "海市蜃楼",
+        hiragana: ["か", "い", "し", "し", "ん", "ろ", "う"],
+        solutions: [
+            { range: [0, 1], kanji: "海", strokes: 9 },
+            { range: [2], kanji: "市", strokes: 5 },
+            { range: [3, 4], kanji: "蜃", strokes: 13 },
+            { range: [5, 6], kanji: "楼", strokes: 13 }
+        ]
+    },
+    {
+        id: 75,
+        text: "空理空論",
+        hiragana: ["く", "う", "り", "く", "う", "ろ", "ん"],
+        solutions: [
+            { range: [0, 1], kanji: "空", strokes: 8 },
+            { range: [2], kanji: "理", strokes: 11 },
+            { range: [3, 4], kanji: "空", strokes: 8 },
+            { range: [5, 6], kanji: "論", strokes: 15 }
+        ]
+    },
+    {
+        id: 76,
+        text: "紙上談兵",
+        hiragana: ["し", "じ", "ょ", "う", "だ", "ん", "ぺ", "い"],
+        solutions: [
+            { range: [0], kanji: "紙", strokes: 10 },
+            { range: [1, 2, 3], kanji: "上", strokes: 3 },
+            { range: [4, 5], kanji: "談", strokes: 15 },
+            { range: [6, 7], kanji: "兵", strokes: 7 }
+        ]
+    },
+    {
+        id: 77,
+        text: "夏下冬上",
+        hiragana: ["か", "か", "と", "う", "じ", "ょ", "う"],
+        solutions: [
+            { range: [0], kanji: "夏", strokes: 10 },
+            { range: [1], kanji: "下", strokes: 3 },
+            { range: [2, 3], kanji: "冬", strokes: 5 },
+            { range: [4, 5, 6], kanji: "上", strokes: 3 }
+        ]
+    },
+    {
+        id: 78,
+        text: "春夏秋冬",
+        hiragana: ["し", "ゅ", "ん", "か", "し", "ゅ", "う", "と", "う"],
+        solutions: [
+            { range: [0, 1, 2], kanji: "春", strokes: 9 },
+            { range: [3], kanji: "夏", strokes: 10 },
+            { range: [4, 5, 6], kanji: "秋", strokes: 9 },
+            { range: [7, 8], kanji: "冬", strokes: 5 }
+        ]
+    },
+    {
+        id: 79,
+        text: "井底之蛙",
+        hiragana: ["せ", "い", "て", "い", "の", "あ"],
+        solutions: [
+            { range: [0, 1], kanji: "井", strokes: 4 },
+            { range: [2, 3], kanji: "底", strokes: 8 },
+            { range: [4], kanji: "之", strokes: 3 },
+            { range: [5], kanji: "蛙", strokes: 12 }
+        ]
+    },
+    {
+        id: 80,
+        text: "経国済民",
+        hiragana: ["け", "い", "こ", "く", "さ", "い", "み", "ん"],
+        solutions: [
+            { range: [0, 1], kanji: "経", strokes: 11 },
+            { range: [2, 3], kanji: "国", strokes: 8 },
+            { range: [4, 5], kanji: "済", strokes: 11 },
+            { range: [6, 7], kanji: "民", strokes: 5 }
+        ]
+    },
+    {
+        id: 81,
+        text: "傀儡政権",
+        hiragana: ["か", "い", "ら", "い", "せ", "い", "け", "ん"],
+        solutions: [
+            { range: [0, 1], kanji: "傀", strokes: 12 },
+            { range: [2, 3], kanji: "儡", strokes: 17 },
+            { range: [4, 5], kanji: "政", strokes: 9 },
+            { range: [6, 7], kanji: "権", strokes: 15 }
+        ]
+    },
+    {
+        id: 82,
+        text: "逆取順守",
+        hiragana: ["ぎ", "ゃ", "く", "し", "ゅ", "じ", "ゅ", "ん", "し", "ゅ"],
+        solutions: [
+            { range: [0, 1, 2], kanji: "逆", strokes: 9 },
+            { range: [3, 4], kanji: "取", strokes: 8 },
+            { range: [5, 6, 7], kanji: "順", strokes: 12 },
+            { range: [8, 9], kanji: "守", strokes: 6 }
+        ]
+    },
+    {
+        id: 83,
+        text: "順風満帆",
+        hiragana: ["じ", "ゅ", "ん", "ぷ", "う", "ま", "ん", "ぱ", "ん"],
+        solutions: [
+            { range: [0, 1, 2], kanji: "順", strokes: 12 },
+            { range: [3, 4], kanji: "風", strokes: 9 },
+            { range: [5, 6], kanji: "満", strokes: 12 },
+            { range: [7, 8], kanji: "帆", strokes: 6 }
+        ]
+    },
+    {
+        id: 84,
+        text: "黒風飛雨",
+        hiragana: ["こ", "く", "ふ", "う", "ひ", "う"],
+        solutions: [
+            { range: [0, 1], kanji: "黒", strokes: 11 },
+            { range: [2, 3], kanji: "風", strokes: 9 },
+            { range: [4], kanji: "飛", strokes: 9 },
+            { range: [5], kanji: "雨", strokes: 8 }
+        ]
+    },
+    {
+        id: 85,
+        text: "雨後春筍",
+        hiragana: ["う", "ご", "し", "ゅ", "ん", "じ", "ゅ", "ん"],
+        solutions: [
+            { range: [0], kanji: "雨", strokes: 8 },
+            { range: [1], kanji: "後", strokes: 9 },
+            { range: [2, 3, 4], kanji: "春", strokes: 9 },
+            { range: [5, 6, 7], kanji: "筍", strokes: 12 }
+        ]
+    },
+    {
+        id: 86,
+        text: "鶏口牛後",
+        hiragana: ["け", "い", "こ", "う", "ぎ", "ゅ", "う", "ご"],
+        solutions: [
+            { range: [0, 1], kanji: "鶏", strokes: 19 },
+            { range: [2, 3], kanji: "口", strokes: 3 },
+            { range: [4, 5, 6], kanji: "牛", strokes: 4 },
+            { range: [7], kanji: "後", strokes: 9 }
+        ]
+    },
+    {
+        id: 87,
+        text: "自今以後",
+        hiragana: ["じ", "こ", "ん", "い", "ご"],
+        solutions: [
+            { range: [0], kanji: "自", strokes: 6 },
+            { range: [1, 2], kanji: "今", strokes: 4 },
+            { range: [3], kanji: "以", strokes: 5 },
+            { range: [4], kanji: "後", strokes: 9 }
+        ]
+    },
+    {
+        id: 88,
+        text: "三十而立",
+        hiragana: ["さ", "ん", "じ", "ゅ", "う", "じ", "り", "つ"],
+        solutions: [
+            { range: [0, 1], kanji: "三", strokes: 3 },
+            { range: [2, 3, 4], kanji: "十", strokes: 2 },
+            { range: [5], kanji: "而", strokes: 6 },
+            { range: [6, 7], kanji: "立", strokes: 5 }
+        ]
+    },
+    {
+        id: 89,
+        text: "自立自存",
+        hiragana: ["じ", "り", "つ", "じ", "そ", "ん"],
+        solutions: [
+            { range: [0], kanji: "自", strokes: 6 },
+            { range: [1, 2], kanji: "立", strokes: 5 },
+            { range: [3], kanji: "自", strokes: 6 },
+            { range: [4, 5], kanji: "存", strokes: 6 }
+        ]
+    },
+    {
+        id: 90,
+        text: "哀毀骨立",
+        hiragana: ["あ", "い", "き", "こ", "つ", "り", "つ"],
+        solutions: [
+            { range: [0, 1], kanji: "哀", strokes: 9 },
+            { range: [2], kanji: "毀", strokes: 13 },
+            { range: [3, 4], kanji: "骨", strokes: 10 },
+            { range: [5, 6], kanji: "立", strokes: 5 }
+        ]
+    },
+    {
+        id: 91,
+        text: "菟糸燕麦",
+        hiragana: ["と", "し", "え", "ん", "ば", "く"],
+        solutions: [
+            { range: [0], kanji: "菟", strokes: 12 },
+            { range: [1], kanji: "糸", strokes: 6 },
+            { range: [2, 3], kanji: "燕", strokes: 16 },
+            { range: [4, 5], kanji: "麦", strokes: 7 }
+        ]
+    },
+    {
+        id: 92,
+        text: "燕雀鴻鵠",
+        hiragana: ["え", "ん", "じ", "ゃ", "く", "こ", "う", "こ", "く"],
+        solutions: [
+            { range: [0, 1], kanji: "燕", strokes: 16 },
+            { range: [2, 3, 4], kanji: "雀", strokes: 11 },
+            { range: [5, 6], kanji: "鴻", strokes: 17 },
+            { range: [7, 8], kanji: "鵠", strokes: 18 }
+        ]
+    },
+    {
+        id: 93,
+        text: "欣喜雀躍",
+        hiragana: ["き", "ん", "き", "じ", "ゃ", "く", "や", "く"],
+        solutions: [
+            { range: [0, 1], kanji: "欣", strokes: 8 },
+            { range: [2], kanji: "喜", strokes: 12 },
+            { range: [3, 4, 5], kanji: "雀", strokes: 11 },
+            { range: [6, 7], kanji: "躍", strokes: 21 }
+        ]
+    },
+    {
+        id: 94,
+        text: "喜躍抃舞",
+        hiragana: ["き", "や", "く", "べ", "ん", "ぶ"],
+        solutions: [
+            { range: [0], kanji: "喜", strokes: 12 },
+            { range: [1, 2], kanji: "躍", strokes: 21 },
+            { range: [3, 4], kanji: "抃", strokes: 7 },
+            { range: [5], kanji: "舞", strokes: 15 }
+        ]
+    },
+    {
+        id: 95,
+        text: "面目躍如",
+        hiragana: ["め", "ん", "も", "く", "や", "く", "じ", "ょ"],
+        solutions: [
+            { range: [0, 1], kanji: "面", strokes: 9 },
+            { range: [2, 3], kanji: "目", strokes: 5 },
+            { range: [4, 5], kanji: "躍", strokes: 21 },
+            { range: [6, 7], kanji: "如", strokes: 6 }
+        ]
+    },
+    {
+        id: 96,
+        text: "名誉挽回",
+        hiragana: ["め", "い", "よ", "ば", "ん", "か", "い"],
+        solutions: [
+            { range: [0, 1], kanji: "名", strokes: 6 },
+            { range: [2], kanji: "誉", strokes: 13 },
+            { range: [3, 4], kanji: "挽", strokes: 10 },
+            { range: [5, 6], kanji: "回", strokes: 6 }
+        ]
+    },
+    {
+        id: 97,
+        text: "汚名返上",
+        hiragana: ["お", "め", "い", "へ", "ん", "じ", "ょ", "う"],
+        solutions: [
+            { range: [0], kanji: "汚", strokes: 6 },
+            { range: [1, 2], kanji: "名", strokes: 6 },
+            { range: [3, 4], kanji: "返", strokes: 7 },
+            { range: [5, 6, 7], kanji: "上", strokes: 3 }
+        ]
+    },
+    {
+        id: 98,
+        text: "往返徒労",
+        hiragana: ["お", "う", "へ", "ん", "と", "ろ", "う"],
+        solutions: [
+            { range: [0, 1], kanji: "往", strokes: 8 },
+            { range: [2, 3], kanji: "返", strokes: 7 },
+            { range: [4], kanji: "徒", strokes: 10 },
+            { range: [5, 6], kanji: "労", strokes: 7 }
+        ]
+    },
+    {
+        id: 99,
+        text: "梅妻鶴子",
+        hiragana: ["ば", "い", "さ", "い", "か", "く", "し"],
+        solutions: [
+            { range: [0, 1], kanji: "梅", strokes: 10 },
+            { range: [2, 3], kanji: "妻", strokes: 8 },
+            { range: [4, 5], kanji: "鶴", strokes: 21 },
+            { range: [6], kanji: "子", strokes: 3 }
+        ]
+    },
+    {
+        id: 100,
+        text: "妻子離散",
+        hiragana: ["さ", "い", "し", "り", "さ", "ん"],
+        solutions: [
+            { range: [0, 1], kanji: "妻", strokes: 8 },
+            { range: [2], kanji: "子", strokes: 3 },
+            { range: [3], kanji: "離", strokes: 18 },
+            { range: [4, 5], kanji: "散", strokes: 12 }
+        ]
+    },
+    {
+        id: 101,
+        text: "糶糴斂散",
+        hiragana: ["ち", "ょ", "う", "て", "き", "れ", "ん", "さ", "ん"],
+        solutions: [
+            { range: [0, 1, 2], kanji: "糶", strokes: 25 },
+            { range: [3, 4], kanji: "糴", strokes: 22 },
+            { range: [5, 6], kanji: "斂", strokes: 17 },
+            { range: [7, 8], kanji: "散", strokes: 12 }
+        ]
+    },
+// --- 2026.01.24 追加 ---
 ];
+
 
 // --- 設定 ---
 const INIT_CHIPS = 500; 
