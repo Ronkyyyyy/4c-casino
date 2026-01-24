@@ -1117,7 +1117,7 @@ const PROBLEM_POOL = [
 
 
 // --- 設定 ---
-const INIT_CHIPS = 500; 
+const INIT_CHIPS = 500;
 const MAX_BONUS_RATE = 1.2;
 const COUNT_SPEED = 800; 
 const ABSORB_DURATION = 600; 
@@ -1436,6 +1436,7 @@ async function execDecision() {
     await absorbCards();
 }
 
+// 【修正済み】アニメーション完了後に要素を非表示にする
 async function absorbCards() {
     const problem = gameQueue[currentRound];
     const reels = document.querySelectorAll(".reel");
@@ -1475,7 +1476,12 @@ function animateAbsorb(cards, targetReel) {
                 card.style.opacity = "0";
             });
         });
-        setTimeout(resolve, ABSORB_DURATION);
+        
+        // 【修正】スマホ等での残像防止
+        setTimeout(() => {
+            cards.forEach(card => card.style.display = "none");
+            resolve();
+        }, ABSORB_DURATION);
     });
 }
 
